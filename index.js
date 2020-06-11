@@ -3,6 +3,7 @@ const massive = require('massive');
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const cors = require('cors');
 
 //LOAD DOTENV CONFIG
 
@@ -21,13 +22,16 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+app.use(cors({
+    allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, authorization",
+    credentials: true
+}));
+
 app.use(session({
     saveUninitialized: false,
     resave: false,
     secret: process.env.SESSION_SECRET_KEY
 }));
-
-app.use(express.static(__dirname + '/public/dist'));
 
 massive({
     host: process.env.DB_HOST,
@@ -88,7 +92,7 @@ massive({
 
     //PAYMENT ENDPOINTS
 
-    app.post('/api/cart/charge', authController.authorize, orderController.makePayment);
+    app.post('/api/order/charge', authController.authorize, orderController.makePayment);
 
     //ORDER ENDPOINTS
     app.get('/api/orders', authController.authorize, orderController.getOrdersByUserId);
